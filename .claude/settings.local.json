@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh auth:*)",
+      "Bash(gh repo:*)",
+      "Bash(vercel --yes --prod)",
+      "Bash(vercel login:*)",
+      "Bash(start \"\" \"https://vercel.com/oauth/device\")"
+    ]
+  }
+}
