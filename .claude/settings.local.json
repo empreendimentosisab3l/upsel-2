@@ -5,7 +5,11 @@
       "Bash(gh repo:*)",
       "Bash(vercel --yes --prod)",
       "Bash(vercel login:*)",
-      "Bash(start \"\" \"https://vercel.com/oauth/device\")"
+      "Bash(start \"\" \"https://vercel.com/oauth/device\")",
+      "Bash(npx vite:*)",
+      "Bash(npm run:*)",
+      "Bash(node_modules/.bin/vite build:*)",
+      "Bash(npm install:*)"
     ]
   }
 }
