@@ -235,8 +235,10 @@
               (function(btn) {
                 btn.addEventListener('click', function(e) {
                   e.preventDefault();
+                  e.stopPropagation();
+                  e.stopImmediatePropagation();
                   if (paytUpsellBtn) paytUpsellBtn.click();
-                });
+                }, true);
               })(el);
             }
           }
@@ -261,8 +263,10 @@
               (function(b) {
                 b.addEventListener('click', function(e) {
                   e.preventDefault();
+                  e.stopPropagation();
+                  e.stopImmediatePropagation();
                   downsellOverlay.classList.add('active');
-                });
+                }, true);
               })(btn);
             }
           }
