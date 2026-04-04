@@ -92,91 +92,145 @@
       display: none;
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.7);
+      background: rgba(0,0,0,0.75);
       z-index: 999999;
       align-items: center;
       justify-content: center;
+      padding: 16px;
     }
     #payt-downsell-overlay.active {
       display: flex;
     }
     #payt-downsell-popup {
       background: #fff;
-      border-radius: 16px;
-      padding: 28px 24px;
-      max-width: 380px;
-      width: 90%;
+      border-radius: 20px;
+      padding: 28px 22px 24px;
+      max-width: 400px;
+      width: 100%;
       text-align: center;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
       animation: popIn 0.3s ease-out;
       position: relative;
     }
     @keyframes popIn {
-      from { transform: scale(0.8); opacity: 0; }
+      from { transform: scale(0.85); opacity: 0; }
       to { transform: scale(1); opacity: 1; }
     }
-    #payt-downsell-popup .popup-emoji {
-      font-size: 48px;
+    #payt-downsell-popup .ds-badge {
+      display: inline-block;
+      background: #dc3545;
+      color: #fff;
+      font-family: sans-serif;
+      font-size: 11px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 20px;
       margin-bottom: 12px;
+    }
+    #payt-downsell-popup .ds-emoji {
+      font-size: 42px;
+      margin-bottom: 10px;
+      display: block;
     }
     #payt-downsell-popup h2 {
       font-family: sans-serif;
       font-size: 20px;
-      color: #333;
-      margin: 0 0 8px;
+      font-weight: bold;
+      color: #1a1a1a;
+      margin: 0 0 10px;
+      line-height: 1.3;
     }
-    #payt-downsell-popup p {
+    #payt-downsell-popup .ds-subtext {
       font-family: sans-serif;
       font-size: 14px;
-      color: #666;
-      margin: 0 0 6px;
+      color: #555;
+      margin: 0 0 14px;
       line-height: 1.5;
     }
-    #payt-downsell-popup .old-price {
+    #payt-downsell-popup .ds-benefits {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 16px;
+      text-align: left;
+    }
+    #payt-downsell-popup .ds-benefits li {
       font-family: sans-serif;
-      font-size: 14px;
+      font-size: 13px;
+      color: #333;
+      padding: 5px 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      line-height: 1.4;
+    }
+    #payt-downsell-popup .ds-benefits li::before {
+      content: "✅";
+      flex-shrink: 0;
+      font-size: 13px;
+    }
+    #payt-downsell-popup .ds-price-block {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 18px;
+    }
+    #payt-downsell-popup .ds-old-price {
+      font-family: sans-serif;
+      font-size: 13px;
       color: #999;
       text-decoration: line-through;
-      margin: 8px 0 2px;
+      margin-bottom: 2px;
     }
-    #payt-downsell-popup .new-price {
+    #payt-downsell-popup .ds-new-price {
       font-family: sans-serif;
-      font-size: 28px;
+      font-size: 32px;
       font-weight: bold;
       color: #28a745;
-      margin: 0 0 16px;
+      line-height: 1.1;
+    }
+    #payt-downsell-popup .ds-new-price small {
+      font-size: 14px;
+      font-weight: normal;
+      color: #555;
     }
     #payt-downsell-popup .downsell-buy-btn {
-      display: inline-block;
+      display: block;
+      width: 100%;
       background: linear-gradient(135deg, #28a745 0%, #1a5e1f 100%);
       color: #fff;
-      padding: 14px 28px;
+      padding: 16px 20px;
       text-decoration: none;
-      font-size: 16px;
+      font-size: 17px;
       font-family: sans-serif;
       font-weight: bold;
-      border-radius: 8px;
+      border-radius: 10px;
       cursor: pointer;
       text-transform: uppercase;
-      box-shadow: 0 4px 12px rgba(40,167,69,0.4);
-      transition: transform 0.2s;
+      box-shadow: 0 6px 18px rgba(40,167,69,0.45);
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: none;
+      letter-spacing: 0.5px;
     }
     #payt-downsell-popup .downsell-buy-btn:hover {
-      transform: scale(1.05);
+      transform: scale(1.03);
+      box-shadow: 0 8px 22px rgba(40,167,69,0.55);
     }
     #payt-downsell-popup .downsell-decline {
       display: block;
-      color: #999;
+      color: #bbb;
       font-family: sans-serif;
-      font-size: 12px;
+      font-size: 11px;
       margin-top: 14px;
       cursor: pointer;
       text-decoration: underline;
       background: none;
       border: none;
+      width: 100%;
     }
     #payt-downsell-popup .downsell-decline:hover {
-      color: #666;
+      color: #888;
     }
   </style>
 </head>
@@ -184,7 +238,7 @@
   <body>
     <div id="root"></div>
 
-    <!-- ===== UPSELL R$67 - Botao Payt oculto (acionado pelo botao do React) ===== -->
+    <!-- ===== UPSELL R$67 - Botao Payt oculto (acionado pelo observer) ===== -->
     <div id="payt-upsell-bar" style="display:none;">
       <a href="#" payt_action="oneclick_buy" data-object="RA5EQR-4OMQ32" class="payt-buy-btn">SIM, EU QUERO!</a>
       <select payt_element='installment' style='display:none' data-object='RA5EQR-4OMQ32'></select>
@@ -193,37 +247,48 @@
     <!-- ===== POPUP DOWNSELL R$47 ===== -->
     <div id="payt-downsell-overlay">
       <div id="payt-downsell-popup">
-        <div class="popup-emoji">&#x1F622;</div>
-        <h2>Espera! Temos uma oferta especial</h2>
-        <p>Entendemos que o valor pode pesar... Por isso, preparamos uma condi&ccedil;&atilde;o <strong>imperd&iacute;vel</strong> s&oacute; para voc&ecirc;!</p>
-        <div class="old-price">De R$ 67,00</div>
-        <div class="new-price">R$ 47,00</div>
-        <a href="#" payt_action="oneclick_buy" data-object="L88JPL-4OMQ32" class="downsell-buy-btn">QUERO POR R$ 47!</a>
+        <div class="ds-badge">Oferta especial para você</div>
+        <span class="ds-emoji">🎁</span>
+        <h2>Espera! Não vá embora ainda...</h2>
+        <p class="ds-subtext">
+          Sabemos que o valor importa. Por isso, temos uma condição <strong>exclusiva e por tempo limitado</strong> só para quem chegou até aqui.
+        </p>
+        <ul class="ds-benefits">
+          <li>Acompanhamento individual direto no WhatsApp</li>
+          <li>Suporte 24h para tirar dúvidas do protocolo</li>
+          <li>Plano personalizado com base no seu perfil</li>
+          <li>Aceleração dos resultados com orientação diária</li>
+        </ul>
+        <div class="ds-price-block">
+          <div class="ds-old-price">De R$ 67,00</div>
+          <div class="ds-new-price">R$ 47,00 <small>pagamento único</small></div>
+        </div>
+        <a href="#" payt_action="oneclick_buy" data-object="L88JPL-4OMQ32" class="downsell-buy-btn">✅ SIM! QUERO POR R$ 47</a>
         <select payt_element='installment' style='display:none' data-object='L88JPL-4OMQ32'></select>
-        <button class="downsell-decline" onclick="window.location.href='https://desafio21dmounjaro.lovable.app/#'">N&atilde;o, obrigado. Seguir sem o acompanhamento.</button>
+        <button class="downsell-decline" onclick="window.location.href='https://desafio21dmounjaro.lovable.app/#'">Não, prefiro seguir sem acompanhamento.</button>
       </div>
     </div>
 
     <!-- ===== SCRIPT PAYT ONE-CLICK BUY ===== -->
     <script type="text/javascript" src="https://checkout.payt.com.br/multiple-oneclickbuyscript/L8Q8DK.js"></script>
 
-    <!-- ===== SCRIPT PARA INTERCEPTAR BOTOES DO REACT ===== -->
+    <!-- ===== SCRIPT PARA INTERCEPTAR BOTOES DO TYPEBOT ===== -->
     <script>
       (function() {
-        var paytUpsellBtn   = document.querySelector('#payt-upsell-bar .payt-buy-btn');
-        var downsellOverlay = document.getElementById('payt-downsell-overlay');
+        var paytUpsellBtn    = document.querySelector('#payt-upsell-bar .payt-buy-btn');
+        var paytDownsellBtn  = document.querySelector('#payt-downsell-popup .downsell-buy-btn');
+        var downsellOverlay  = document.getElementById('payt-downsell-overlay');
 
         var observer = new MutationObserver(function() {
 
-          // ----- UPSELL: "CLIQUE AQUI PARA PARTICIPAR" -----
-          // Apenas leaf elements (sem filhos a/button) com texto exato
+          // ----- UPSELL: texto exato do botao final do Typebot -----
           var allLinks = document.querySelectorAll('#root a, #root button');
           for (var i = 0; i < allLinks.length; i++) {
             var el = allLinks[i];
             var text = (el.textContent || '').trim();
 
             if (
-              text === 'CLIQUE AQUI PARA PARTICIPAR' &&
+              text === 'CLIQUE AQUI PARA PARTICIPAR!' &&
               !el.querySelector('a, button') &&
               !el.dataset.paytHijacked
             ) {
@@ -243,15 +308,14 @@
             }
           }
 
-          // ----- DOWNSELL: "quero perder essa oportunidade" -----
-          // Apenas leaf elements com texto exato
+          // ----- DOWNSELL: texto exato do botao de recusa do Typebot -----
           var allEls = document.querySelectorAll('#root a, #root button, #root div[role], #root span');
           for (var j = 0; j < allEls.length; j++) {
             var btn = allEls[j];
             var btnText = (btn.textContent || '').trim();
 
             if (
-              btnText === 'quero perder essa oportunidade' &&
+              btnText === 'Não, quero perder essa oportunidade e acessar somente o Gelatina Mounjaro' &&
               !btn.querySelector('a, button') &&
               !btn.dataset.paytHijacked
             ) {
