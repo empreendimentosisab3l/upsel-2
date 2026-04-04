@@ -23,7 +23,7 @@
   <script defer="" src="js/~flock.js" data-proxy-url="/~api/analytics"></script>
 
   <style>
-    /* ===== PAYT UPSELL/DOWNSELL STYLES ===== */
+    /* ===== PAYT UPSELL BAR (bottom fixed) ===== */
     #payt-upsell-bar {
       display: none;
       position: fixed;
@@ -32,51 +32,70 @@
       right: 0;
       z-index: 99999;
       background: linear-gradient(135deg, #1a5e1f 0%, #28a745 100%);
-      padding: 16px 12px;
-      box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+      padding: 18px 16px 14px;
+      box-shadow: 0 -4px 24px rgba(0,0,0,0.35);
       text-align: center;
       animation: slideUp 0.5s ease-out;
+    }
+    #payt-upsell-bar.active {
+      display: block;
     }
     @keyframes slideUp {
       from { transform: translateY(100%); }
       to { transform: translateY(0); }
     }
-    #payt-upsell-bar .payt-price {
+    #payt-upsell-bar .payt-headline {
       color: #fff;
       font-family: sans-serif;
-      font-size: 14px;
-      margin-bottom: 8px;
+      font-size: 13px;
+      margin-bottom: 4px;
+      font-weight: normal;
+      opacity: 0.9;
+    }
+    #payt-upsell-bar .payt-price {
+      color: #ffd700;
+      font-family: sans-serif;
+      font-size: 22px;
+      margin-bottom: 10px;
       font-weight: bold;
     }
-    #payt-upsell-bar .payt-price span {
-      font-size: 22px;
-      color: #ffd700;
+    #payt-upsell-bar .payt-price small {
+      font-size: 13px;
+      color: rgba(255,255,255,0.7);
+      font-weight: normal;
+      text-decoration: line-through;
     }
     #payt-upsell-bar .payt-buy-btn {
       display: inline-block;
       background: #ffd700;
       color: #1a5e1f;
-      padding: 14px 32px;
+      padding: 16px 36px;
       text-decoration: none;
       font-size: 18px;
       font-family: sans-serif;
       font-weight: bold;
-      border-radius: 8px;
+      border-radius: 10px;
       cursor: pointer;
       text-transform: uppercase;
       letter-spacing: 1px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
       transition: transform 0.2s, box-shadow 0.2s;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.03); }
     }
     #payt-upsell-bar .payt-buy-btn:hover {
       transform: scale(1.05);
-      box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+      animation: none;
     }
     #payt-upsell-bar .payt-decline {
       display: block;
-      color: rgba(255,255,255,0.7);
+      color: rgba(255,255,255,0.6);
       font-family: sans-serif;
-      font-size: 12px;
+      font-size: 11px;
       margin-top: 10px;
       cursor: pointer;
       text-decoration: underline;
@@ -166,7 +185,7 @@
       line-height: 1.4;
     }
     #payt-downsell-popup .ds-benefits li::before {
-      content: "✅";
+      content: "\2705";
       flex-shrink: 0;
       font-size: 13px;
     }
@@ -238,10 +257,13 @@
   <body>
     <div id="root"></div>
 
-    <!-- ===== UPSELL R$67 - Botao Payt oculto (acionado pelo observer) ===== -->
-    <div id="payt-upsell-bar" style="display:none;">
+    <!-- ===== UPSELL R$67 — Barra fixa no rodape com botao Payt REAL ===== -->
+    <div id="payt-upsell-bar">
+      <div class="payt-headline">Acompanhamento Individual com Desconto</div>
+      <div class="payt-price"><small>De R$ 97,00</small> R$ 67,00</div>
       <a href="#" payt_action="oneclick_buy" data-object="RA5EQR-4OMQ32" class="payt-buy-btn">SIM, EU QUERO!</a>
       <select payt_element='installment' style='display:none' data-object='RA5EQR-4OMQ32'></select>
+      <button class="payt-decline" id="payt-upsell-decline">Agora não, obrigado.</button>
     </div>
 
     <!-- ===== POPUP DOWNSELL R$47 ===== -->
@@ -263,7 +285,7 @@
           <div class="ds-old-price">De R$ 67,00</div>
           <div class="ds-new-price">R$ 47,00 <small>pagamento único</small></div>
         </div>
-        <a href="#" payt_action="oneclick_buy" data-object="L88JPL-4OMQ32" class="downsell-buy-btn">✅ SIM! QUERO POR R$ 47</a>
+        <a href="#" payt_action="oneclick_buy" data-object="L88JPL-4OMQ32" class="downsell-buy-btn">SIM! QUERO POR R$ 47</a>
         <select payt_element='installment' style='display:none' data-object='L88JPL-4OMQ32'></select>
         <button class="downsell-decline" onclick="window.location.href='https://desafio21dmounjaro.lovable.app/#'">Não, prefiro seguir sem acompanhamento.</button>
       </div>
@@ -272,16 +294,24 @@
     <!-- ===== SCRIPT PAYT ONE-CLICK BUY ===== -->
     <script type="text/javascript" src="https://checkout.payt.com.br/multiple-oneclickbuyscript/L8Q8DK.js"></script>
 
-    <!-- ===== SCRIPT PARA INTERCEPTAR BOTOES DO TYPEBOT ===== -->
+    <!-- ===== OBSERVER: Mostra barra/popup quando Typebot chega nos botoes finais ===== -->
     <script>
       (function() {
-        var paytUpsellBtn    = document.querySelector('#payt-upsell-bar .payt-buy-btn');
-        var paytDownsellBtn  = document.querySelector('#payt-downsell-popup .downsell-buy-btn');
-        var downsellOverlay  = document.getElementById('payt-downsell-overlay');
+        var upsellBar       = document.getElementById('payt-upsell-bar');
+        var downsellOverlay = document.getElementById('payt-downsell-overlay');
+        var declineBtn      = document.getElementById('payt-upsell-decline');
+
+        // Decline no upsell bar → abre popup downsell
+        declineBtn.addEventListener('click', function() {
+          upsellBar.classList.remove('active');
+          downsellOverlay.classList.add('active');
+        });
 
         var observer = new MutationObserver(function() {
 
-          // ----- UPSELL: texto exato do botao final do Typebot -----
+          // ----- UPSELL: quando Typebot mostra "CLIQUE AQUI PARA PARTICIPAR!" -----
+          // Em vez de clicar programaticamente (Payt rejeita isTrusted=false),
+          // mostramos a barra Payt real para o lead clicar fisicamente.
           var allLinks = document.querySelectorAll('#root a, #root button');
           for (var i = 0; i < allLinks.length; i++) {
             var el = allLinks[i];
@@ -293,22 +323,17 @@
               !el.dataset.paytHijacked
             ) {
               el.dataset.paytHijacked = 'true';
-              el.removeAttribute('href');
-              el.removeAttribute('target');
-              el.style.cursor = 'pointer';
 
-              (function(btn) {
-                btn.addEventListener('click', function(e) {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  e.stopImmediatePropagation();
-                  if (paytUpsellBtn) paytUpsellBtn.click();
-                }, true);
-              })(el);
+              // Esconde o botao Cakto do Typebot (ja aponta pra void(0) mas nao serve)
+              el.style.display = 'none';
+
+              // Mostra a barra Payt real no rodape
+              upsellBar.classList.add('active');
             }
           }
 
-          // ----- DOWNSELL: texto exato do botao de recusa do Typebot -----
+          // ----- DOWNSELL: "Não, quero perder essa oportunidade..." -----
+          // Bloqueia o React de abrir o Dialog Cakto e abre nosso popup Payt
           var allEls = document.querySelectorAll('#root a, #root button, #root div[role], #root span');
           for (var j = 0; j < allEls.length; j++) {
             var btn = allEls[j];
@@ -320,9 +345,25 @@
               !btn.dataset.paytHijacked
             ) {
               btn.dataset.paytHijacked = 'true';
-              btn.removeAttribute('href');
-              btn.removeAttribute('target');
-              btn.style.cursor = 'pointer';
+
+              (function(b) {
+                b.addEventListener('click', function(e) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  e.stopImmediatePropagation();
+                  // Esconde o upsell bar e abre o popup downsell
+                  upsellBar.classList.remove('active');
+                  downsellOverlay.classList.add('active');
+                }, true);
+              })(btn);
+            }
+
+            // ----- Seguranca: se o Dialog React interno abrir, redireciona pro nosso popup -----
+            if (
+              btnText === 'QUERO APROVEITAR O DESCONTO!' &&
+              !btn.dataset.paytHijacked
+            ) {
+              btn.dataset.paytHijacked = 'true';
 
               (function(b) {
                 b.addEventListener('click', function(e) {
