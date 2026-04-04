@@ -9,29 +9,236 @@
     <link rel="preconnect" href="https://s3.typebot.io" crossorigin="">
     <link rel="preconnect" href="https://s3.fr-par.scw.cloud" crossorigin="">
 
-    <!-- TODO: Update og:title to match your application name -->
-    
-    
     <meta property="og:type" content="website">
     <meta property="og:image" content="images/id-preview-b08ed306--e0ba3f54-57e7-4d05-848c-7c020472ee29.lovable.app-1772758028163.png">
-
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@Lovable">
     <meta name="twitter:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/65abe4eb-cb48-420d-ad50-222cac1c3905/id-preview-b08ed306--e0ba3f54-57e7-4d05-848c-7c020472ee29.lovable.app-1772758028163.png">
-    
-  
-  
-  
-  <meta property="og:title" content="Acompanhamento Individual">
-  <meta name="twitter:title" content="Acompanhamento Individual">
-  <meta property="og:description" content="Acompanhamento Individual no WhatsApp 24horas por dia!">
-  <meta name="twitter:description" content="Acompanhamento Individual no WhatsApp 24horas por dia!">
+    <meta property="og:title" content="Acompanhamento Individual">
+    <meta name="twitter:title" content="Acompanhamento Individual">
+    <meta property="og:description" content="Acompanhamento Individual no WhatsApp 24horas por dia!">
+    <meta name="twitter:description" content="Acompanhamento Individual no WhatsApp 24horas por dia!">
   <script type="module" crossorigin="" src="js/index-MMVrU8Ax.js"></script>
   <link rel="stylesheet" crossorigin="" href="css/index-lO3CTcgO.css">
-<script defer="" src="js/~flock.js" data-proxy-url="/~api/analytics"></script></head>
+  <script defer="" src="js/~flock.js" data-proxy-url="/~api/analytics"></script>
+
+  <style>
+    /* ===== PAYT UPSELL/DOWNSELL STYLES ===== */
+    #payt-upsell-bar {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 99999;
+      background: linear-gradient(135deg, #1a5e1f 0%, #28a745 100%);
+      padding: 16px 12px;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+      text-align: center;
+      animation: slideUp 0.5s ease-out;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    #payt-upsell-bar .payt-price {
+      color: #fff;
+      font-family: sans-serif;
+      font-size: 14px;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+    #payt-upsell-bar .payt-price span {
+      font-size: 22px;
+      color: #ffd700;
+    }
+    #payt-upsell-bar .payt-buy-btn {
+      display: inline-block;
+      background: #ffd700;
+      color: #1a5e1f;
+      padding: 14px 32px;
+      text-decoration: none;
+      font-size: 18px;
+      font-family: sans-serif;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    #payt-upsell-bar .payt-buy-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+    }
+    #payt-upsell-bar .payt-decline {
+      display: block;
+      color: rgba(255,255,255,0.7);
+      font-family: sans-serif;
+      font-size: 12px;
+      margin-top: 10px;
+      cursor: pointer;
+      text-decoration: underline;
+      background: none;
+      border: none;
+    }
+    #payt-upsell-bar .payt-decline:hover {
+      color: #fff;
+    }
+
+    /* ===== DOWNSELL POPUP ===== */
+    #payt-downsell-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 999999;
+      align-items: center;
+      justify-content: center;
+    }
+    #payt-downsell-overlay.active {
+      display: flex;
+    }
+    #payt-downsell-popup {
+      background: #fff;
+      border-radius: 16px;
+      padding: 28px 24px;
+      max-width: 380px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      animation: popIn 0.3s ease-out;
+      position: relative;
+    }
+    @keyframes popIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    #payt-downsell-popup .popup-emoji {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+    #payt-downsell-popup h2 {
+      font-family: sans-serif;
+      font-size: 20px;
+      color: #333;
+      margin: 0 0 8px;
+    }
+    #payt-downsell-popup p {
+      font-family: sans-serif;
+      font-size: 14px;
+      color: #666;
+      margin: 0 0 6px;
+      line-height: 1.5;
+    }
+    #payt-downsell-popup .old-price {
+      font-family: sans-serif;
+      font-size: 14px;
+      color: #999;
+      text-decoration: line-through;
+      margin: 8px 0 2px;
+    }
+    #payt-downsell-popup .new-price {
+      font-family: sans-serif;
+      font-size: 28px;
+      font-weight: bold;
+      color: #28a745;
+      margin: 0 0 16px;
+    }
+    #payt-downsell-popup .downsell-buy-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #28a745 0%, #1a5e1f 100%);
+      color: #fff;
+      padding: 14px 28px;
+      text-decoration: none;
+      font-size: 16px;
+      font-family: sans-serif;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      text-transform: uppercase;
+      box-shadow: 0 4px 12px rgba(40,167,69,0.4);
+      transition: transform 0.2s;
+    }
+    #payt-downsell-popup .downsell-buy-btn:hover {
+      transform: scale(1.05);
+    }
+    #payt-downsell-popup .downsell-decline {
+      display: block;
+      color: #999;
+      font-family: sans-serif;
+      font-size: 12px;
+      margin-top: 14px;
+      cursor: pointer;
+      text-decoration: underline;
+      background: none;
+      border: none;
+    }
+    #payt-downsell-popup .downsell-decline:hover {
+      color: #666;
+    }
+  </style>
+</head>
 
   <body>
     <div id="root"></div>
-  
+
+    <!-- ===== BARRA DE UPSELL R$67 (aparece quando React mostrar o botao de compra) ===== -->
+    <div id="payt-upsell-bar">
+      <div class="payt-price">Oferta exclusiva por apenas <span>R$ 67,00</span></div>
+      <a href="#" payt_action="oneclick_buy" data-object="RA5EQR-4OMQ32" class="payt-buy-btn">SIM, EU QUERO!</a>
+      <select payt_element='installment' style='display:none' data-object='RA5EQR-4OMQ32'></select>
+      <button class="payt-decline" onclick="document.getElementById('payt-upsell-bar').style.display='none'; document.getElementById('payt-downsell-overlay').classList.add('active');">Obrigado, mas vou perder essa oportunidade...</button>
+    </div>
+
+    <!-- ===== POPUP DOWNSELL R$47 ===== -->
+    <div id="payt-downsell-overlay">
+      <div id="payt-downsell-popup">
+        <div class="popup-emoji">&#x1F622;</div>
+        <h2>Espera! Temos uma oferta especial</h2>
+        <p>Entendemos que o valor pode pesar... Por isso, preparamos uma condi&ccedil;&atilde;o <strong>imperd&iacute;vel</strong> s&oacute; para voc&ecirc;!</p>
+        <div class="old-price">De R$ 67,00</div>
+        <div class="new-price">R$ 47,00</div>
+        <a href="#" payt_action="oneclick_buy" data-object="L88JPL-4OMQ32" class="downsell-buy-btn">QUERO POR R$ 47!</a>
+        <select payt_element='installment' style='display:none' data-object='L88JPL-4OMQ32'></select>
+        <button class="downsell-decline" onclick="window.location.href='https://desafio21dmounjaro.lovable.app/#'">N&atilde;o, obrigado. Seguir sem o acompanhamento.</button>
+      </div>
+    </div>
+
+    <!-- ===== SCRIPT PAYT ONE-CLICK BUY ===== -->
+    <script type="text/javascript" src="https://checkout.payt.com.br/multiple-oneclickbuyscript/L8Q8DK.js"></script>
+
+    <!-- ===== SCRIPT PARA MOSTRAR BARRA DE UPSELL QUANDO BOTAO APARECER ===== -->
+    <script>
+      (function() {
+        // Observa o DOM para detectar quando o botao de compra do React aparece
+        var shown = false;
+        var observer = new MutationObserver(function() {
+          if (shown) return;
+          // Procura por links que vao para o Cakto (botao original de compra)
+          var links = document.querySelectorAll('a[href*="cakto"], button');
+          for (var i = 0; i < links.length; i++) {
+            var text = links[i].textContent || '';
+            if (text.indexOf('QUERO SABER') !== -1 || text.indexOf('QUERO') !== -1 || (links[i].href && links[i].href.indexOf('cakto') !== -1)) {
+              // Intercepta o botao original - substitui o link pelo upsell Payt
+              links[i].addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                document.getElementById('payt-upsell-bar').style.display = 'block';
+                window.scrollTo(0, document.body.scrollHeight);
+              });
+              shown = true;
+              // Mostra a barra de upsell automaticamente
+              setTimeout(function() {
+                document.getElementById('payt-upsell-bar').style.display = 'block';
+              }, 2000);
+              break;
+            }
+          }
+        });
+        observer.observe(document.getElementById('root'), { childList: true, subtree: true });
+      })();
+    </script>
 
 </body></html>
