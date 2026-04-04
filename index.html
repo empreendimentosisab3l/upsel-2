@@ -210,37 +210,45 @@
     <!-- ===== SCRIPT PARA INTERCEPTAR BOTOES DO REACT ===== -->
     <script>
       (function() {
+        // Referencia aos botoes Payt ja inicializados no DOM
+        var paytUpsellBtn   = document.querySelector('#payt-upsell-bar .payt-buy-btn');
+        var downsellOverlay = document.getElementById('payt-downsell-overlay');
+
         var observer = new MutationObserver(function() {
-          // Busca TODOS os links com href para Cakto e substitui
-          var caktoLinks = document.querySelectorAll('#root a[href*="cakto"]');
-          for (var i = 0; i < caktoLinks.length; i++) {
-            var el = caktoLinks[i];
+
+          // ----- UPSELL: "CLIQUE AQUI PARA PARTICIPAR" -----
+          var allLinks = document.querySelectorAll('#root a, #root button');
+          for (var i = 0; i < allLinks.length; i++) {
+            var el = allLinks[i];
             var text = (el.textContent || '').trim();
 
             if (text.indexOf('CLIQUE AQUI PARA PARTICIPAR') !== -1 && !el.dataset.paytHijacked) {
-              // Remove href e target para impedir abertura do Cakto
+              el.dataset.paytHijacked = 'true';
               el.removeAttribute('href');
               el.removeAttribute('target');
               el.style.cursor = 'pointer';
-              el.dataset.paytHijacked = 'true';
 
-              // Copia os atributos Payt para o botao original
-              el.setAttribute('payt_action', 'oneclick_buy');
-              el.setAttribute('data-object', 'RA5EQR-4OMQ32');
+              (function(btn) {
+                btn.addEventListener('click', function(e) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  e.stopImmediatePropagation();
+                  // Dispara clique no botao Payt ja inicializado
+                  if (paytUpsellBtn) paytUpsellBtn.click();
+                }, true);
+              })(el);
             }
           }
 
-          // Intercepta o botao de recusa -> abre popup downsell
-          var allEls = document.querySelectorAll('#root a, #root button, #root div');
+          // ----- DOWNSELL: "quero perder essa oportunidade" -----
+          var allEls = document.querySelectorAll('#root a, #root button, #root div[role], #root span');
           for (var j = 0; j < allEls.length; j++) {
             var btn = allEls[j];
             var btnText = (btn.textContent || '').trim();
 
             if (btnText.indexOf('quero perder essa oportunidade') !== -1 && !btn.dataset.paytHijacked) {
               btn.dataset.paytHijacked = 'true';
-              if (btn.href) {
-                btn.removeAttribute('href');
-              }
+              btn.removeAttribute('href');
               btn.removeAttribute('target');
               btn.style.cursor = 'pointer';
 
@@ -249,7 +257,7 @@
                   e.preventDefault();
                   e.stopPropagation();
                   e.stopImmediatePropagation();
-                  document.getElementById('payt-downsell-overlay').classList.add('active');
+                  downsellOverlay.classList.add('active');
                 }, true);
               })(btn);
             }
