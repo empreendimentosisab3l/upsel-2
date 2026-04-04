@@ -184,12 +184,10 @@
   <body>
     <div id="root"></div>
 
-    <!-- ===== BARRA DE UPSELL R$67 (aparece quando React mostrar o botao de compra) ===== -->
-    <div id="payt-upsell-bar">
-      <div class="payt-price">Oferta exclusiva por apenas <span>R$ 67,00</span></div>
+    <!-- ===== UPSELL R$67 - Botao Payt oculto (acionado pelo botao do React) ===== -->
+    <div id="payt-upsell-bar" style="display:none;">
       <a href="#" payt_action="oneclick_buy" data-object="RA5EQR-4OMQ32" class="payt-buy-btn">SIM, EU QUERO!</a>
       <select payt_element='installment' style='display:none' data-object='RA5EQR-4OMQ32'></select>
-      <button class="payt-decline" onclick="document.getElementById('payt-upsell-bar').style.display='none'; document.getElementById('payt-downsell-overlay').classList.add('active');">Obrigado, mas vou perder essa oportunidade...</button>
     </div>
 
     <!-- ===== POPUP DOWNSELL R$47 ===== -->
@@ -209,34 +207,50 @@
     <!-- ===== SCRIPT PAYT ONE-CLICK BUY ===== -->
     <script type="text/javascript" src="https://checkout.payt.com.br/multiple-oneclickbuyscript/L8Q8DK.js"></script>
 
-    <!-- ===== SCRIPT PARA MOSTRAR BARRA DE UPSELL QUANDO BOTAO APARECER ===== -->
+    <!-- ===== SCRIPT PARA INTERCEPTAR BOTOES DO REACT ===== -->
     <script>
       (function() {
-        // Observa o DOM para detectar quando o botao de compra do React aparece
-        var shown = false;
+        var upsellIntercepted = false;
+        var declineIntercepted = false;
+
         var observer = new MutationObserver(function() {
-          if (shown) return;
-          // Procura por links que vao para o Cakto (botao original de compra)
-          var links = document.querySelectorAll('a[href*="cakto"], button');
-          for (var i = 0; i < links.length; i++) {
-            var text = links[i].textContent || '';
-            if (text.indexOf('QUERO SABER') !== -1 || text.indexOf('QUERO') !== -1 || (links[i].href && links[i].href.indexOf('cakto') !== -1)) {
-              // Intercepta o botao original - substitui o link pelo upsell Payt
-              links[i].addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                document.getElementById('payt-upsell-bar').style.display = 'block';
-                window.scrollTo(0, document.body.scrollHeight);
-              });
-              shown = true;
-              // Mostra a barra de upsell automaticamente
-              setTimeout(function() {
-                document.getElementById('payt-upsell-bar').style.display = 'block';
-              }, 2000);
-              break;
+          // Busca todos os elementos clicaveis dentro do app React
+          var allElements = document.querySelectorAll('#root a, #root button, #root div[role="button"], #root span');
+
+          for (var i = 0; i < allElements.length; i++) {
+            var el = allElements[i];
+            var text = (el.textContent || '').trim();
+
+            // Intercepta o botao "CLIQUE AQUI PARA PARTICIPAR!" -> Upsell R$67 Payt
+            if (!upsellIntercepted && text.indexOf('CLIQUE AQUI PARA PARTICIPAR') !== -1) {
+              (function(btn) {
+                btn.addEventListener('click', function(e) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  e.stopImmediatePropagation();
+                  // Dispara o clique no botao Payt do upsell
+                  var paytBtn = document.querySelector('#payt-upsell-bar .payt-buy-btn');
+                  if (paytBtn) paytBtn.click();
+                }, true);
+              })(el);
+              upsellIntercepted = true;
+            }
+
+            // Intercepta o link "Nao, quero perder essa oportunidade..." -> Abre popup downsell
+            if (!declineIntercepted && text.indexOf('quero perder essa oportunidade') !== -1) {
+              (function(btn) {
+                btn.addEventListener('click', function(e) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  e.stopImmediatePropagation();
+                  document.getElementById('payt-downsell-overlay').classList.add('active');
+                }, true);
+              })(el);
+              declineIntercepted = true;
             }
           }
         });
+
         observer.observe(document.getElementById('root'), { childList: true, subtree: true });
       })();
     </script>
